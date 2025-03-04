@@ -1,0 +1,130 @@
+[gd_scene load_steps=18 format=3 uid="uid://bdqsr1nvvrdt6"]
+
+[ext_resource type="Script" path="res://scripts/xr-initializer.gd" id="1_i8hff"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_dop1b"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_3ig5r"]
+sky_material = SubResource("ProceduralSkyMaterial_dop1b")
+
+[sub_resource type="Environment" id="Environment_xtr8f"]
+background_mode = 2
+sky = SubResource("Sky_3ig5r")
+tonemap_mode = 2
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fx8bv"]
+size = Vector3(0.5, 1.8, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uwk2f"]
+albedo_color = Color(0, 0.329412, 0.141176, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_2sheo"]
+material = SubResource("StandardMaterial3D_uwk2f")
+size = Vector2(10, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ecctn"]
+size = Vector3(10, 1, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n3b56"]
+albedo_color = Color(0.913725, 0.117647, 0.388235, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_5x4td"]
+material = SubResource("StandardMaterial3D_n3b56")
+radius = 0.25
+height = 0.5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_w6h4m"]
+radius = 0.25
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7qdb1"]
+albedo_color = Color(0, 0.537255, 0.482353, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_axaot"]
+material = SubResource("StandardMaterial3D_7qdb1")
+size = Vector3(0.25, 0.25, 0.25)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1s3n8"]
+size = Vector3(0.25, 0.25, 0.25)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xrux2"]
+albedo_color = Color(0.992157, 0.847059, 0.207843, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_lanfh"]
+material = SubResource("StandardMaterial3D_xrux2")
+top_radius = 1.0
+bottom_radius = 1.0
+height = 1.0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_jewpp"]
+height = 1.0
+radius = 1.0
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_i8hff")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_xtr8f")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
+shape = SubResource("BoxShape3D_fx8bv")
+
+[node name="XROrigin3D" type="XROrigin3D" parent="CharacterBody3D"]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="CharacterBody3D/XROrigin3D"]
+
+[node name="LeftController" type="XRController3D" parent="CharacterBody3D/XROrigin3D"]
+tracker = &"left_hand"
+
+[node name="RightController" type="XRController3D" parent="CharacterBody3D/XROrigin3D"]
+tracker = &"right_hand"
+
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="GroundPlane" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("PlaneMesh_2sheo")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_ecctn")
+
+[node name="SphereRigidBody" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.377363, 1.25, -1.58833)
+
+[node name="Sphere" type="MeshInstance3D" parent="SphereRigidBody"]
+mesh = SubResource("SphereMesh_5x4td")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SphereRigidBody"]
+shape = SubResource("SphereShape3D_w6h4m")
+
+[node name="BoxRigidBody" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.355061, 1.125, -1.51972)
+mass = 100.0
+gravity_scale = 0.1
+
+[node name="Box" type="MeshInstance3D" parent="BoxRigidBody"]
+mesh = SubResource("BoxMesh_axaot")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoxRigidBody"]
+shape = SubResource("BoxShape3D_1s3n8")
+
+[node name="PlatformRigidBody" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
+
+[node name="Platform" type="MeshInstance3D" parent="PlatformRigidBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("CylinderMesh_lanfh")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlatformRigidBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("CylinderShape3D_jewpp")
